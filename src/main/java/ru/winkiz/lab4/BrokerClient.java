@@ -161,28 +161,33 @@ public final class BrokerClient implements AutoCloseable {
         try { closed = true; changed.signalAll(); }
         finally { stateLock.unlock(); }
         IOException error = null;
+        boolean interrupted = false;
+        if (reader != null && reader != Thread.currentThread() && reader.isAlive() && !socket.isClosed()) {
+            // A receiver has no outgoing frames. FIN asks the server to deregister it;
+            // a cooperating server then closes its side. This is TCP shutdown, not a delivery ACK.
+            try { socket.shutdownOutput(); reader.join(500); }
+            catch (InterruptedException e) { interrupted = true; }
+            catch (IOException ignored) { /* Always follow with the unconditional socket.close below. */ }
+        }
         try { socket.close(); } catch (IOException e) { error = e; }
         if (reader != null && reader != Thread.currentThread()) {
             reader.interrupt();
-            boolean interrupted = false;
             long begin = System.nanoTime();
             while (reader.isAlive() && System.nanoTime() - begin < 3_000_000_000L) {
                 try { reader.join(100); } catch (InterruptedException e) { interrupted = true; }
             }
-            if (interrupted) Thread.currentThread().interrupt();
             if (reader.isAlive()) error = new IOException("Receiver thread did not terminate");
         }
         if (writeWatchdog != null) {
             writeWatchdog.shutdownNow();
-            boolean interrupted = false;
             long begin = System.nanoTime();
             while (!writeWatchdog.isTerminated() && System.nanoTime() - begin < 3_000_000_000L) {
                 try { writeWatchdog.awaitTermination(100, TimeUnit.MILLISECONDS); }
                 catch (InterruptedException e) { interrupted = true; }
             }
-            if (interrupted) Thread.currentThread().interrupt();
             if (!writeWatchdog.isTerminated()) error = new IOException("Send watchdog did not terminate");
         }
+        if (interrupted) Thread.currentThread().interrupt();
         if (error != null) throw error;
     }
 }

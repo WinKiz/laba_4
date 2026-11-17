@@ -180,7 +180,7 @@ public final class SelfTest {
             } finally { release.countDown(); }
             check(Main.countLabThreads() == 0, "No client reader threads remain");
         });
-        test("Concurrent receive gives disjoint messages; interrupt is preserved", () -> {
+        test("Concurrent receive gives disjoint messages; interrupt is respected", () -> {
             CountDownLatch release = new CountDownLatch(1);
             try (Fixture fixture = new Fixture(socket -> {
                 readLine(socket.getInputStream());
@@ -247,15 +247,17 @@ public final class SelfTest {
     private static void faultyDelivery(int mode) throws Exception {
         try (ServerSocket server = new ServerSocket(0, 10, java.net.InetAddress.getLoopbackAddress());
              ExecutorService worker = Executors.newSingleThreadExecutor()) {
-            server.setSoTimeout(3000);
+            // run() generates its corpus before connecting. This setup limit is independent
+            // of the five-second delivery deadline, which starts only at the first send.
+            server.setSoTimeout(15000);
             Future<?> peer = worker.submit(() -> {
                 try (Socket sender = server.accept()) {
-                    sender.setSoTimeout(3000);
+                    sender.setSoTimeout(10000); sender.setTcpNoDelay(true);
                     InputStream in = sender.getInputStream(); readLine(in);
                     byte[][] before = new byte[500][];
                     for (int i = 0; i < 500; i++) before[i] = rawFrame(in);
                     try (Socket receiver = server.accept()) {
-                        receiver.setSoTimeout(3000); readLine(receiver.getInputStream());
+                        receiver.setSoTimeout(10000); receiver.setTcpNoDelay(true); readLine(receiver.getInputStream());
                         for (int i = 0; i < 500; i++) {
                             byte[] body = before[mode == 0 && i == 1 ? 0 : i].clone();
                             if (mode == 1 && i == 0) body[body.length - 1] = '!';
@@ -270,11 +272,11 @@ public final class SelfTest {
             });
             var runner = new ScenarioRunner(new ScenarioRunner.Options("127.0.0.1", server.getLocalPort(), Duration.ofSeconds(5), 71, "fault"));
             var result = runner.run(new ScenarioRunner.Plan("fault-" + mode, 1, 1, 1, 1000, 256, true));
+            peer.get(2, TimeUnit.SECONDS);
             check(!result.passed(), "Fault must not pass");
-            if (mode == 0) check(result.received() == 1000 && result.duplicates() == 1 && result.lost() == 1, "Equal counts cannot hide loss/duplication");
+            if (mode == 0) check(result.received() == 1000 && result.duplicates() == 1 && result.lost() == 1, "Equal counts cannot hide loss/duplication: " + result);
             if (mode == 1) check(result.corrupted() == 1 && result.received() == 1000, "Payload validation");
             if (mode == 2) check(result.received() == 1001 && result.duplicates() == 1, "Extra frame after expected total");
-            peer.get(2, TimeUnit.SECONDS);
         }
     }
     private static void test(String name, Checked body) throws Exception {

@@ -69,7 +69,7 @@ public final class LocalBroker implements AutoCloseable {
     private void session(Socket socket) {
         Mailbox box = null;
         Peer peer = null;
-        try (socket) {
+        try {
             socket.setTcpNoDelay(true);
             socket.setSoTimeout(3000);
             var in = new BufferedInputStream(socket.getInputStream());
@@ -111,6 +111,10 @@ public final class LocalBroker implements AutoCloseable {
             }
         } finally {
             if (box != null && peer != null) synchronized (box) { box.receivers.remove(peer); box.notifyAll(); }
+            // Remove the receiver BEFORE closing: peer EOF then confirms deregistration on this broker.
+            try { socket.close(); } catch (IOException e) {
+                if (!closed) { protocolErrors.incrementAndGet(); System.err.println("Local broker close: " + e); }
+            }
             sockets.remove(socket);
         }
     }
