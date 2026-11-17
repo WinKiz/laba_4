@@ -1,0 +1,29 @@
+PASS UTF-8 byte length, framing and fragmented input
+PASS Reject malformed/truncated frame msg 1|a
+PASS Reject malformed/truncated frame message -1|
+PASS Reject malformed/truncated frame message 0|
+PASS Reject malformed/truncated frame message x|
+PASS Reject malformed/truncated frame message +1|a
+PASS Reject malformed/truncated frame message 2147483648|
+PASS Reject malformed/truncated frame message 1048577|
+PASS Reject malformed/truncated frame message 3|ab
+PASS Reject malformed/truncated frame message 1
+PASS Reject malformed/truncated frame message  1|a
+PASS Reject malformed/truncated frame message 1
+PASS Header bound and invalid UTF-8
+PASS Validation before connection and payload bounds
+PASS Unavailable server returns IOException
+PASS Setup, exact bodies, partial timeout and immutable copy
+PASS Background error wakes receive: message 5|ab
+PASS Background error wakes receive: message x|
+PASS Background error wakes receive: message 2|??
+PASS Background error wakes receive: 
+PASS Half frame is bounded by receive timeout and close
+PASS Concurrent send: 4 threads share one client, no mixed frames
+PASS Close wakes all waiting consumers and joins reader
+PASS Concurrent receive gives disjoint messages; interrupt is preserved
+PASS Scenario detects equal-count loss/duplicate, corrupted body, extra frame: 0
+PASS Scenario detects equal-count loss/duplicate, corrupted body, extra frame: 1
+PASS Scenario detects equal-count loss/duplicate, corrupted body, extra frame: 2
+PASS All 3 scenarios against local TCP broker
+SELFTEST PASS: 28 checks

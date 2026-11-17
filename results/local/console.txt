@@ -1,0 +1,359 @@
+scenario-1 warmup #1: sent=1000 received=1000 lost=0 duplicates=0 time=0.093658 s X=10677.2 msg/s PASS
+  R1: 1000 (100.00%)
+scenario-1 measurement #1: sent=1000 received=1000 lost=0 duplicates=0 time=0.053439 s X=18713.0 msg/s PASS
+  R1: 1000 (100.00%)
+scenario-1 measurement #2: sent=1000 received=1000 lost=0 duplicates=0 time=0.066004 s X=15150.5 msg/s PASS
+  R1: 1000 (100.00%)
+scenario-1 measurement #3: sent=1000 received=1000 lost=0 duplicates=0 time=0.536656 s X=1863.4 msg/s PASS
+  R1: 1000 (100.00%)
+scenario-1 measurement #4: sent=1000 received=1000 lost=0 duplicates=0 time=0.472783 s X=2115.1 msg/s PASS
+  R1: 1000 (100.00%)
+scenario-1 measurement #5: sent=1000 received=1000 lost=0 duplicates=0 time=0.082628 s X=12102.5 msg/s PASS
+  R1: 1000 (100.00%)
+scenario-2 warmup #1: sent=1000 received=1000 lost=0 duplicates=0 time=0.603929 s X=1655.8 msg/s PASS
+  R1: 250 (25.00%)
+  R2: 750 (75.00%)
+scenario-2 measurement #1: sent=1000 received=1000 lost=0 duplicates=0 time=0.070420 s X=14200.6 msg/s PASS
+  R1: 250 (25.00%)
+  R2: 750 (75.00%)
+scenario-2 measurement #2: sent=1000 received=1000 lost=0 duplicates=0 time=0.068038 s X=14697.7 msg/s PASS
+  R1: 250 (25.00%)
+  R2: 750 (75.00%)
+scenario-2 measurement #3: sent=1000 received=1000 lost=0 duplicates=0 time=0.062148 s X=16090.7 msg/s PASS
+  R1: 250 (25.00%)
+  R2: 750 (75.00%)
+scenario-2 measurement #4: sent=1000 received=1000 lost=0 duplicates=0 time=0.061673 s X=16214.6 msg/s PASS
+  R1: 250 (25.00%)
+  R2: 750 (75.00%)
+scenario-2 measurement #5: sent=1000 received=1000 lost=0 duplicates=0 time=0.062182 s X=16081.9 msg/s PASS
+  R1: 250 (25.00%)
+  R2: 750 (75.00%)
+scenario-3 warmup #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.045762 s X=43704.3 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+scenario-3 measurement #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.036111 s X=55384.5 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+scenario-3 measurement #2: sent=2000 received=2000 lost=0 duplicates=0 time=0.014924 s X=134011.4 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+scenario-3 measurement #3: sent=2000 received=2000 lost=0 duplicates=0 time=0.026818 s X=74577.9 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+scenario-3 measurement #4: sent=2000 received=2000 lost=0 duplicates=0 time=0.047513 s X=42094.0 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+scenario-3 measurement #5: sent=2000 received=2000 lost=0 duplicates=0 time=0.042143 s X=47457.1 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+receivers-1 warmup #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.023748 s X=84219.0 msg/s PASS
+  R1: 2000 (100.00%)
+receivers-1 measurement #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.037357 s X=53538.2 msg/s PASS
+  R1: 2000 (100.00%)
+receivers-1 measurement #2: sent=2000 received=2000 lost=0 duplicates=0 time=0.021332 s X=93756.7 msg/s PASS
+  R1: 2000 (100.00%)
+receivers-1 measurement #3: sent=2000 received=2000 lost=0 duplicates=0 time=0.028769 s X=69518.3 msg/s PASS
+  R1: 2000 (100.00%)
+receivers-1 measurement #4: sent=2000 received=2000 lost=0 duplicates=0 time=0.024448 s X=81805.6 msg/s PASS
+  R1: 2000 (100.00%)
+receivers-1 measurement #5: sent=2000 received=2000 lost=0 duplicates=0 time=0.038868 s X=51456.7 msg/s PASS
+  R1: 2000 (100.00%)
+receivers-2 warmup #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.040522 s X=49355.7 msg/s PASS
+  R1: 1000 (50.00%)
+  R2: 1000 (50.00%)
+receivers-2 measurement #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.043656 s X=45812.4 msg/s PASS
+  R1: 1000 (50.00%)
+  R2: 1000 (50.00%)
+receivers-2 measurement #2: sent=2000 received=2000 lost=0 duplicates=0 time=0.037776 s X=52943.7 msg/s PASS
+  R1: 1000 (50.00%)
+  R2: 1000 (50.00%)
+receivers-2 measurement #3: sent=2000 received=2000 lost=0 duplicates=0 time=0.039471 s X=50669.9 msg/s PASS
+  R1: 1000 (50.00%)
+  R2: 1000 (50.00%)
+receivers-2 measurement #4: sent=2000 received=2000 lost=0 duplicates=0 time=0.034853 s X=57384.4 msg/s PASS
+  R1: 1000 (50.00%)
+  R2: 1000 (50.00%)
+receivers-2 measurement #5: sent=2000 received=2000 lost=0 duplicates=0 time=0.035482 s X=56367.1 msg/s PASS
+  R1: 1000 (50.00%)
+  R2: 1000 (50.00%)
+receivers-3 warmup #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.031618 s X=63254.3 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+receivers-3 measurement #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.035559 s X=56244.9 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+receivers-3 measurement #2: sent=2000 received=2000 lost=0 duplicates=0 time=0.029258 s X=68358.5 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+receivers-3 measurement #3: sent=2000 received=2000 lost=0 duplicates=0 time=0.034793 s X=57483.3 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+receivers-3 measurement #4: sent=2000 received=2000 lost=0 duplicates=0 time=0.032984 s X=60635.8 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+receivers-3 measurement #5: sent=2000 received=2000 lost=0 duplicates=0 time=0.036429 s X=54901.3 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+receivers-4 warmup #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.029415 s X=67993.2 msg/s PASS
+  R1: 500 (25.00%)
+  R2: 500 (25.00%)
+  R3: 500 (25.00%)
+  R4: 500 (25.00%)
+receivers-4 measurement #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.030415 s X=65757.7 msg/s PASS
+  R1: 500 (25.00%)
+  R2: 500 (25.00%)
+  R3: 500 (25.00%)
+  R4: 500 (25.00%)
+receivers-4 measurement #2: sent=2000 received=2000 lost=0 duplicates=0 time=0.037499 s X=53334.5 msg/s PASS
+  R1: 500 (25.00%)
+  R2: 500 (25.00%)
+  R3: 500 (25.00%)
+  R4: 500 (25.00%)
+receivers-4 measurement #3: sent=2000 received=2000 lost=0 duplicates=0 time=0.034910 s X=57290.0 msg/s PASS
+  R1: 500 (25.00%)
+  R2: 500 (25.00%)
+  R3: 500 (25.00%)
+  R4: 500 (25.00%)
+receivers-4 measurement #4: sent=2000 received=2000 lost=0 duplicates=0 time=0.032836 s X=60909.5 msg/s PASS
+  R1: 500 (25.00%)
+  R2: 500 (25.00%)
+  R3: 500 (25.00%)
+  R4: 500 (25.00%)
+receivers-4 measurement #5: sent=2000 received=2000 lost=0 duplicates=0 time=0.034159 s X=58549.7 msg/s PASS
+  R1: 500 (25.00%)
+  R2: 500 (25.00%)
+  R3: 500 (25.00%)
+  R4: 500 (25.00%)
+receivers-6 warmup #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.033417 s X=59850.0 msg/s PASS
+  R1: 334 (16.70%)
+  R2: 334 (16.70%)
+  R3: 333 (16.65%)
+  R4: 333 (16.65%)
+  R5: 333 (16.65%)
+  R6: 333 (16.65%)
+receivers-6 measurement #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.034370 s X=58191.1 msg/s PASS
+  R1: 334 (16.70%)
+  R2: 334 (16.70%)
+  R3: 333 (16.65%)
+  R4: 333 (16.65%)
+  R5: 333 (16.65%)
+  R6: 333 (16.65%)
+receivers-6 measurement #2: sent=2000 received=2000 lost=0 duplicates=0 time=0.033965 s X=58884.1 msg/s PASS
+  R1: 334 (16.70%)
+  R2: 334 (16.70%)
+  R3: 333 (16.65%)
+  R4: 333 (16.65%)
+  R5: 333 (16.65%)
+  R6: 333 (16.65%)
+receivers-6 measurement #3: sent=2000 received=2000 lost=0 duplicates=0 time=0.039473 s X=50667.3 msg/s PASS
+  R1: 334 (16.70%)
+  R2: 334 (16.70%)
+  R3: 333 (16.65%)
+  R4: 333 (16.65%)
+  R5: 333 (16.65%)
+  R6: 333 (16.65%)
+receivers-6 measurement #4: sent=2000 received=2000 lost=0 duplicates=0 time=0.034715 s X=57611.3 msg/s PASS
+  R1: 334 (16.70%)
+  R2: 334 (16.70%)
+  R3: 333 (16.65%)
+  R4: 333 (16.65%)
+  R5: 333 (16.65%)
+  R6: 333 (16.65%)
+receivers-6 measurement #5: sent=2000 received=2000 lost=0 duplicates=0 time=0.034374 s X=58183.7 msg/s PASS
+  R1: 334 (16.70%)
+  R2: 334 (16.70%)
+  R3: 333 (16.65%)
+  R4: 333 (16.65%)
+  R5: 333 (16.65%)
+  R6: 333 (16.65%)
+bytes-16 warmup #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.031991 s X=62518.0 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-16 measurement #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.030171 s X=66289.9 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-16 measurement #2: sent=2000 received=2000 lost=0 duplicates=0 time=0.034533 s X=57916.1 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-16 measurement #3: sent=2000 received=2000 lost=0 duplicates=0 time=0.032792 s X=60991.0 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-16 measurement #4: sent=2000 received=2000 lost=0 duplicates=0 time=0.032060 s X=62383.4 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-16 measurement #5: sent=2000 received=2000 lost=0 duplicates=0 time=0.034338 s X=58244.0 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-256 warmup #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.017902 s X=111718.7 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-256 measurement #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.032041 s X=62419.4 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-256 measurement #2: sent=2000 received=2000 lost=0 duplicates=0 time=0.034500 s X=57970.7 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-256 measurement #3: sent=2000 received=2000 lost=0 duplicates=0 time=0.035069 s X=57030.9 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-256 measurement #4: sent=2000 received=2000 lost=0 duplicates=0 time=0.032869 s X=60847.8 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-256 measurement #5: sent=2000 received=2000 lost=0 duplicates=0 time=0.031036 s X=64440.5 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-4096 warmup #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.093615 s X=21364.2 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-4096 measurement #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.099105 s X=20180.7 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-4096 measurement #2: sent=2000 received=2000 lost=0 duplicates=0 time=0.103292 s X=19362.5 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-4096 measurement #3: sent=2000 received=2000 lost=0 duplicates=0 time=0.100978 s X=19806.4 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-4096 measurement #4: sent=2000 received=2000 lost=0 duplicates=0 time=0.094229 s X=21225.0 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-4096 measurement #5: sent=2000 received=2000 lost=0 duplicates=0 time=0.078816 s X=25375.5 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-65536 warmup #1: sent=2000 received=2000 lost=0 duplicates=0 time=1.174560 s X=1702.8 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-65536 measurement #1: sent=2000 received=2000 lost=0 duplicates=0 time=1.141881 s X=1751.5 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-65536 measurement #2: sent=2000 received=2000 lost=0 duplicates=0 time=1.099630 s X=1818.8 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-65536 measurement #3: sent=2000 received=2000 lost=0 duplicates=0 time=1.049003 s X=1906.6 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-65536 measurement #4: sent=2000 received=2000 lost=0 duplicates=0 time=1.041509 s X=1920.3 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+bytes-65536 measurement #5: sent=2000 received=2000 lost=0 duplicates=0 time=1.046369 s X=1911.4 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+nodelay-true warmup #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.028038 s X=71331.5 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+nodelay-true measurement #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.033327 s X=60011.8 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+nodelay-true measurement #2: sent=2000 received=2000 lost=0 duplicates=0 time=0.025796 s X=77532.0 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+nodelay-true measurement #3: sent=2000 received=2000 lost=0 duplicates=0 time=0.031604 s X=63283.7 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+nodelay-true measurement #4: sent=2000 received=2000 lost=0 duplicates=0 time=0.027338 s X=73159.6 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 667 (33.35%)
+  R3: 666 (33.30%)
+nodelay-true measurement #5: sent=2000 received=2000 lost=0 duplicates=0 time=0.057375 s X=34858.3 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 666 (33.30%)
+  R3: 667 (33.35%)
+nodelay-false warmup #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.081868 s X=24429.5 msg/s PASS
+  R1: 466 (23.30%)
+  R2: 767 (38.35%)
+  R3: 767 (38.35%)
+nodelay-false measurement #1: sent=2000 received=2000 lost=0 duplicates=0 time=0.161786 s X=12362.0 msg/s PASS
+  R1: 666 (33.30%)
+  R2: 667 (33.35%)
+  R3: 667 (33.35%)
+nodelay-false measurement #2: sent=2000 received=2000 lost=0 duplicates=0 time=0.379798 s X=5266.0 msg/s PASS
+  R1: 883 (44.15%)
+  R2: 884 (44.20%)
+  R3: 233 (11.65%)
+  Distribution warning: a receiver has less than 20%; inspect server scheduling.
+nodelay-false measurement #3: sent=2000 received=2000 lost=0 duplicates=0 time=0.321799 s X=6215.1 msg/s PASS
+  R1: 884 (44.20%)
+  R2: 883 (44.15%)
+  R3: 233 (11.65%)
+  Distribution warning: a receiver has less than 20%; inspect server scheduling.
+nodelay-false measurement #4: sent=2000 received=2000 lost=0 duplicates=0 time=0.293634 s X=6811.2 msg/s PASS
+  R1: 0 (0.00%)
+  R2: 1000 (50.00%)
+  R3: 1000 (50.00%)
+  Distribution warning: a receiver has less than 20%; inspect server scheduling.
+nodelay-false measurement #5: sent=2000 received=2000 lost=0 duplicates=0 time=0.176847 s X=11309.2 msg/s PASS
+  R1: 667 (33.35%)
+  R2: 666 (33.30%)
+  R3: 667 (33.35%)
+load-4x4 warmup #1: sent=10000 received=10000 lost=0 duplicates=0 time=0.776203 s X=12883.2 msg/s PASS
+  R1: 2500 (25.00%)
+  R2: 2500 (25.00%)
+  R3: 2500 (25.00%)
+  R4: 2500 (25.00%)
+load-4x4 measurement #1: sent=10000 received=10000 lost=0 duplicates=0 time=0.143208 s X=69828.5 msg/s PASS
+  R1: 2500 (25.00%)
+  R2: 2500 (25.00%)
+  R3: 2500 (25.00%)
+  R4: 2500 (25.00%)
+load-4x4 measurement #2: sent=10000 received=10000 lost=0 duplicates=0 time=0.148033 s X=67552.4 msg/s PASS
+  R1: 2500 (25.00%)
+  R2: 2500 (25.00%)
+  R3: 2500 (25.00%)
+  R4: 2500 (25.00%)
+load-4x4 measurement #3: sent=10000 received=10000 lost=0 duplicates=0 time=0.137428 s X=72765.2 msg/s PASS
+  R1: 2500 (25.00%)
+  R2: 2500 (25.00%)
+  R3: 2500 (25.00%)
+  R4: 2500 (25.00%)
+load-4x4 measurement #4: sent=10000 received=10000 lost=0 duplicates=0 time=0.164692 s X=60719.6 msg/s PASS
+  R1: 2500 (25.00%)
+  R2: 2500 (25.00%)
+  R3: 2500 (25.00%)
+  R4: 2500 (25.00%)
+load-4x4 measurement #5: sent=10000 received=10000 lost=0 duplicates=0 time=0.156504 s X=63896.3 msg/s PASS
+  R1: 2500 (25.00%)
+  R2: 2500 (25.00%)
+  R3: 2500 (25.00%)
+  R4: 2500 (25.00%)
+
+All scenarios: PASS. Reports: C:\Users\denis\OneDrive\пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ\пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ (2)\пїЅпїЅпїЅпїЅ 4\lab4-broker-client\results\local
