@@ -44,6 +44,7 @@ public final class ScenarioRunner {
         final Set<String> seen = ConcurrentHashMap.newKeySet();
         final ConcurrentHashMap<String, Long> sendTimes = new ConcurrentHashMap<>();
         final ConcurrentHashMap<String, Long> arrivals = new ConcurrentHashMap<>();
+        final Map<String, CountDownLatch> processed = new HashMap<>();
         final List<String> errors = new CopyOnWriteArrayList<>();
         final List<BrokerClient> clients = new CopyOnWriteArrayList<>();
         final AtomicInteger totalReceived = new AtomicInteger();
@@ -90,13 +91,15 @@ public final class ScenarioRunner {
             if (!expected.containsKey(id)) unexpected.incrementAndGet();
             else if (!expected.get(id).equals(message)) corrupted.incrementAndGet();
             if (!seen.add(id)) duplicates.incrementAndGet();
-            arrivals.putIfAbsent(id, now);
             synchronized (progress) {
                 counts[receiver]++;
                 totalReceived.incrementAndGet();
                 lastReceived = Math.max(lastReceived, now);
+                arrivals.putIfAbsent(id, now);
                 progress.notifyAll();
             }
+            CountDownLatch processedMessage = processed.get(id);
+            if (processedMessage != null) processedMessage.countDown();
         }
 
         void receiveLoop(int index, BrokerClient client) {
@@ -133,11 +136,7 @@ public final class ScenarioRunner {
                     if (plan.scenario() == 2 && firstClosed.getCount() != 0) {
                         // Until R1 closes, only one unconsumed frame is in flight.
                         // This is test coordination, not a protocol-level delivery acknowledgement.
-                        synchronized (progress) {
-                            while (!arrivals.containsKey(id) && !stopped && remaining() > 0)
-                                TimeUnit.NANOSECONDS.timedWait(progress, remaining());
-                        }
-                        if (!arrivals.containsKey(id)) throw new TimeoutException("Scenario 2 delivery barrier timeout");
+                        await(processed.get(id));
                         if (counts[0] >= plan.total() / 4) await(firstClosed);
                     }
                 }
@@ -156,6 +155,7 @@ public final class ScenarioRunner {
                 String id = String.format(java.util.Locale.ROOT, "%02d-%06d", sender, i);
                 String message = payload(id, plan.payloadBytes(), random);
                 state.expected.put(id, message); messages.add(message);
+                if (plan.scenario() == 2) state.processed.put(id, new CountDownLatch(1));
             }
             generated.add(messages);
         }

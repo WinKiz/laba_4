@@ -1,6 +1,8 @@
 target/
 results/*/
 !results/local/
+!results/regression/
+!results/diagnostics/
 .idea/
 *.iml
 *-check.log
