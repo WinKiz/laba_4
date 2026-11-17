@@ -78,7 +78,7 @@ environment = dict(line.split("=", 1) for line in (folder / "environment.txt").r
 assert environment["lab_threads_after_close"] == "0" and environment["protocol_errors"] == "0"
 
 manifest = {
-    "benchmark_source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
+    "benchmark_source_commit": subprocess.check_output(["git", "-c", f"safe.directory={root.as_posix()}", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
     "runs": len(rows), "configurations": len(groups), "measured_runs": 75,
     "all_passed": True, "all_delivery_and_summary_metrics_reconciled": True,
     "sha256": {str(p.relative_to(root)).replace("\\", "/"): hashlib.sha256(p.read_bytes()).hexdigest()

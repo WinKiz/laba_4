@@ -1,19 +1,19 @@
 {
-  "benchmark_source_commit": "14d2bf46d657574f031703551b00dd35084ec337",
+  "benchmark_source_commit": "381af68fe74f271920414454e0e39ce32f4e8557",
   "runs": 90,
   "configurations": 15,
   "measured_runs": 75,
   "all_passed": true,
   "all_delivery_and_summary_metrics_reconciled": true,
   "sha256": {
-    "src/main/java/ru/winkiz/lab4/BrokerClient.java": "d8cfe1375213ee7a222f5b6f41fda3096760eda2bba988531356d09451aa5b74",
-    "src/main/java/ru/winkiz/lab4/LocalBroker.java": "fc3ff4e304fdc7c854a57623dd10a5303e2c87c8ecdb25f58167beada0e4c4eb",
+    "src/main/java/ru/winkiz/lab4/BrokerClient.java": "8cf56463175036eef3188448784313a15f959d382eec785c705fdc0180c1e41b",
+    "src/main/java/ru/winkiz/lab4/LocalBroker.java": "ea54599d3997c228bf06a028b555f7da8640daee1964cd0979e30ffafd0d6639",
     "src/main/java/ru/winkiz/lab4/Main.java": "1b85150bf9612a188efc4e623c8df33ae5a6697aff15438d2b39a07705a87057",
     "src/main/java/ru/winkiz/lab4/Protocol.java": "2e4ef67dae4dc88bb985a5a9d5ebab8a060b26cee70570f5b42fc91b31421751",
-    "src/main/java/ru/winkiz/lab4/ReportWriter.java": "018bff61a8e3161a533cfd5dfbf5c22b6b5d76371490701be404c8f104aa2c29",
-    "src/main/java/ru/winkiz/lab4/ScenarioRunner.java": "cc1d452fc8d3e77cd03cc8777fe28ffec7692a547def639545fe481e9cd72d79",
-    "results/local/measurements.csv": "da703818988b129168598c00d279a65517785c701481a15f70a9b09fa4272f30",
-    "results/local/shares.csv": "f30ac063f84a5a2e830304ddc67c7d45d58f7e0472ec59d92a331f696a195e4d",
-    "results/local/summary.csv": "ff74ed180569ca198af3e01cf40313c79baa63ce40697ea5706d17405ee3194a"
+    "src/main/java/ru/winkiz/lab4/ReportWriter.java": "d2666d94b43f4d2ece9d1716e104a66fa2f0b2fe39d0b97aa33205d15faa135e",
+    "src/main/java/ru/winkiz/lab4/ScenarioRunner.java": "9a0bb54390408e9d200aa821271d24f55906032ee299e364845c6528d56fafb2",
+    "results/local/measurements.csv": "d8e7378a620fb36f9f94864724123194facea05a75eb94391a8eeb6a5ec96675",
+    "results/local/shares.csv": "95345cb9541ef5505fa1441603858c0945c2f43aeadc4e7444d2352df0f93108",
+    "results/local/summary.csv": "fd4094728f3b6bcbd6b32f9b00a583e912c4a8c6afe530b354fd324218b31e46"
   }
 }
