@@ -3,4 +3,5 @@ results/*/
 !results/local/
 .idea/
 *.iml
+*-check.log
 .DS_Store

@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -36,6 +38,7 @@ public final class BrokerClient implements AutoCloseable {
     private IOException failure;
     private boolean closed;
     private final Thread reader;
+    private final ScheduledThreadPoolExecutor writeWatchdog;
     private record Received(String text, int bytes) { }
 
     public BrokerClient(String host, int port, Role role, String queue) throws IOException {
@@ -60,6 +63,9 @@ public final class BrokerClient implements AutoCloseable {
             out.flush();
             reader = role == Role.RECEIVER
                     ? new Thread(this::readLoop, "broker-client-reader-" + IDS.incrementAndGet()) : null;
+            writeWatchdog = role == Role.SENDER ? new ScheduledThreadPoolExecutor(1,
+                    task -> new Thread(task, "broker-client-write-watchdog-" + IDS.incrementAndGet())) : null;
+            if (writeWatchdog != null) writeWatchdog.setRemoveOnCancelPolicy(true);
             if (reader != null) reader.start();
         } catch (IOException | RuntimeException e) {
             try { socket.close(); } catch (IOException closing) { e.addSuppressed(closing); }
@@ -74,8 +80,13 @@ public final class BrokerClient implements AutoCloseable {
         synchronized (writeLock) {
             stateLock.lock();
             try { checkState(); } finally { stateLock.unlock(); }
+            // Socket SO_TIMEOUT applies to reads only. A deadline closes a blocked write as well.
+            java.util.concurrent.ScheduledFuture<?> deadline;
+            try { deadline = writeWatchdog.schedule(() -> fail(new java.net.SocketTimeoutException("Send exceeded 10 seconds")), 10, TimeUnit.SECONDS); }
+            catch (java.util.concurrent.RejectedExecutionException e) { throw new IOException("Client is closing", e); }
             try { Protocol.writeMessage(out, bytes); }
             catch (IOException e) { fail(e); throw e; }
+            finally { deadline.cancel(false); }
         }
     }
 
@@ -160,6 +171,17 @@ public final class BrokerClient implements AutoCloseable {
             }
             if (interrupted) Thread.currentThread().interrupt();
             if (reader.isAlive()) error = new IOException("Receiver thread did not terminate");
+        }
+        if (writeWatchdog != null) {
+            writeWatchdog.shutdownNow();
+            boolean interrupted = false;
+            long begin = System.nanoTime();
+            while (!writeWatchdog.isTerminated() && System.nanoTime() - begin < 3_000_000_000L) {
+                try { writeWatchdog.awaitTermination(100, TimeUnit.MILLISECONDS); }
+                catch (InterruptedException e) { interrupted = true; }
+            }
+            if (interrupted) Thread.currentThread().interrupt();
+            if (!writeWatchdog.isTerminated()) error = new IOException("Send watchdog did not terminate");
         }
         if (error != null) throw error;
     }
