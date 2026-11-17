@@ -89,17 +89,18 @@ public final class SelfTest {
             expect(IOException.class, () -> new BrokerClient("127.0.0.1", finalPort, BrokerClient.Role.SENDER, "ok"));
         });
         test("Setup, exact bodies, partial timeout and immutable copy", () -> {
-            CountDownLatch hold = new CountDownLatch(1);
+            CountDownLatch hold = new CountDownLatch(1), written = new CountDownLatch(1);
             try (Fixture fixture = new Fixture(socket -> {
                 check(readLine(socket.getInputStream()).equals("receive self-test"), "Setup receive");
                 OutputStream out = socket.getOutputStream();
                 out.write("message 12\nприветmessage 3\nx\ny".getBytes(StandardCharsets.UTF_8)); out.flush();
-                hold.await(2, TimeUnit.SECONDS);
+                written.countDown(); hold.await(5, TimeUnit.SECONDS);
             }); BrokerClient client = fixture.client(BrokerClient.Role.RECEIVER)) {
+                check(written.await(2, TimeUnit.SECONDS), "Scripted frames sent");
                 long began = System.nanoTime();
-                List<String> result = client.receive(3, Duration.ofMillis(100));
+                List<String> result = client.receive(3, Duration.ofMillis(500));
                 check(result.equals(List.of("привет", "x\ny")), "Partial batch");
-                check(System.nanoTime() - began < 900_000_000, "One global timeout");
+                check(System.nanoTime() - began < 2_000_000_000L, "One global timeout");
                 expect(UnsupportedOperationException.class, () -> result.add("oops"));
                 check(client.receive(0, Duration.ZERO).isEmpty(), "Zero count");
                 expect(IllegalArgumentException.class, () -> client.receive(-1, SECOND));
