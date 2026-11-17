@@ -148,7 +148,8 @@ public final class ScenarioRunner {
     public Result run(Plan plan) throws InterruptedException {
         RunState state = new RunState(plan);
         List<List<String>> generated = new ArrayList<>();
-        Random random = new Random(options.seed() ^ plan.name().hashCode());
+        // Same messages for the same scenario/size, even when receivers or TCP_NODELAY change.
+        Random random = new Random(options.seed() ^ plan.scenario());
         for (int sender = 0; sender < plan.senders(); sender++) {
             List<String> messages = new ArrayList<>();
             for (int i = 0; i < plan.perSender(); i++) {

@@ -11,7 +11,7 @@ $sources = @(Get-ChildItem -Recurse src/main/java -Filter *.java | ForEach-Objec
 if ($LASTEXITCODE -ne 0) { throw 'Compilation failed' }
 $tests = @(Get-ChildItem -Recurse src/test/java -Filter *.java | ForEach-Object FullName)
 if ($tests.Count -gt 0) {
-    # Compile together: javac on some Windows installations mishandles a Cyrillic classpath.
+    # Compile together so this fallback build does not depend on existing class files.
     & $javacTool --release 21 -encoding UTF-8 -d target/test-classes $sources $tests
     if ($LASTEXITCODE -ne 0) { throw 'Test compilation failed' }
     & $javaTool -cp target/test-classes ru.winkiz.lab4.SelfTest

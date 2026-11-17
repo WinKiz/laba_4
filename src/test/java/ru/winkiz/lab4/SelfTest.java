@@ -180,6 +180,40 @@ public final class SelfTest {
             } finally { release.countDown(); }
             check(Main.countLabThreads() == 0, "No client reader threads remain");
         });
+        test("Concurrent receive gives disjoint messages; interrupt is preserved", () -> {
+            CountDownLatch release = new CountDownLatch(1);
+            try (Fixture fixture = new Fixture(socket -> {
+                readLine(socket.getInputStream());
+                for (int i = 0; i < 100; i++) {
+                    byte[] body = ("id-" + i).getBytes(StandardCharsets.US_ASCII);
+                    socket.getOutputStream().write(("message " + body.length + "\n").getBytes(StandardCharsets.US_ASCII));
+                    socket.getOutputStream().write(body);
+                }
+                socket.getOutputStream().flush(); release.await(3, TimeUnit.SECONDS);
+            }); BrokerClient client = fixture.client(BrokerClient.Role.RECEIVER)) {
+                ExecutorService consumers = Executors.newFixedThreadPool(2);
+                try {
+                    Future<List<String>> first = consumers.submit(() -> client.receive(50, SECOND));
+                    Future<List<String>> second = consumers.submit(() -> client.receive(50, SECOND));
+                    Set<String> seen = new HashSet<>(first.get(2, TimeUnit.SECONDS));
+                    check(seen.size() == 50, "First consumer unique");
+                    for (String item : second.get(2, TimeUnit.SECONDS)) check(seen.add(item), "Disjoint consumers");
+                    check(seen.size() == 100, "All messages consumed exactly once");
+                    Future<Boolean> interrupted = consumers.submit(() -> {
+                        Thread.currentThread().interrupt();
+                        try { client.receive(1, SECOND); return false; }
+                        catch (InterruptedException expected) { return true; }
+                        catch (IOException e) { return false; }
+                    });
+                    check(interrupted.get(1, TimeUnit.SECONDS), "Interrupted caller exits receive");
+                } finally { consumers.shutdownNow(); consumers.awaitTermination(1, TimeUnit.SECONDS); release.countDown(); }
+            } finally { release.countDown(); }
+        });
+        for (int mode = 0; mode < 3; mode++) {
+            int fault = mode;
+            test("Scenario detects equal-count loss/duplicate, corrupted body, extra frame: " + mode,
+                    () -> faultyDelivery(fault));
+        }
         test("All 3 scenarios against local TCP broker", () -> {
             try (LocalBroker broker = new LocalBroker("127.0.0.1", 0)) {
                 var runner = new ScenarioRunner(new ScenarioRunner.Options("127.0.0.1", broker.port(), Duration.ofSeconds(10), 17, "self"));
@@ -198,6 +232,50 @@ public final class SelfTest {
         ByteArrayOutputStream line = new ByteArrayOutputStream();
         for (int b; (b = input.read()) != -1;) { if (b == '\n') return line.toString(StandardCharsets.US_ASCII); line.write(b); }
         throw new EOFException("Scripted peer expected complete header");
+    }
+    private static byte[] rawFrame(InputStream in) throws IOException {
+        String header = readLine(in);
+        int length = Integer.parseInt(header.substring("message ".length()));
+        byte[] body = in.readNBytes(length);
+        check(body.length == length, "Scripted broker received complete frame");
+        return body;
+    }
+    private static void rawWrite(OutputStream out, byte[] body) throws IOException {
+        out.write(("message " + body.length + "\n").getBytes(StandardCharsets.US_ASCII));
+        out.write(body); out.flush();
+    }
+    private static void faultyDelivery(int mode) throws Exception {
+        try (ServerSocket server = new ServerSocket(0, 10, java.net.InetAddress.getLoopbackAddress());
+             ExecutorService worker = Executors.newSingleThreadExecutor()) {
+            server.setSoTimeout(3000);
+            Future<?> peer = worker.submit(() -> {
+                try (Socket sender = server.accept()) {
+                    sender.setSoTimeout(3000);
+                    InputStream in = sender.getInputStream(); readLine(in);
+                    byte[][] before = new byte[500][];
+                    for (int i = 0; i < 500; i++) before[i] = rawFrame(in);
+                    try (Socket receiver = server.accept()) {
+                        receiver.setSoTimeout(3000); readLine(receiver.getInputStream());
+                        for (int i = 0; i < 500; i++) {
+                            byte[] body = before[mode == 0 && i == 1 ? 0 : i].clone();
+                            if (mode == 1 && i == 0) body[body.length - 1] = '!';
+                            rawWrite(receiver.getOutputStream(), body);
+                        }
+                        for (int i = 0; i < 500; i++) rawWrite(receiver.getOutputStream(), rawFrame(in));
+                        if (mode == 2) rawWrite(receiver.getOutputStream(), before[0]);
+                        // Hold connection until the runner closes it; EOF must not mask frame validation.
+                        receiver.getInputStream().read();
+                    }
+                } catch (Exception e) { throw new RuntimeException(e); }
+            });
+            var runner = new ScenarioRunner(new ScenarioRunner.Options("127.0.0.1", server.getLocalPort(), Duration.ofSeconds(5), 71, "fault"));
+            var result = runner.run(new ScenarioRunner.Plan("fault-" + mode, 1, 1, 1, 1000, 256, true));
+            check(!result.passed(), "Fault must not pass");
+            if (mode == 0) check(result.received() == 1000 && result.duplicates() == 1 && result.lost() == 1, "Equal counts cannot hide loss/duplication");
+            if (mode == 1) check(result.corrupted() == 1 && result.received() == 1000, "Payload validation");
+            if (mode == 2) check(result.received() == 1001 && result.duplicates() == 1, "Extra frame after expected total");
+            peer.get(2, TimeUnit.SECONDS);
+        }
     }
     private static void test(String name, Checked body) throws Exception {
         body.run(); passed++; System.out.println("PASS " + name);
