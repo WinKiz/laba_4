@@ -1,0 +1,6 @@
+target/
+results/*/
+!results/local/
+.idea/
+*.iml
+.DS_Store
