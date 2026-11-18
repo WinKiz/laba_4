@@ -1,0 +1,20 @@
+{
+  "benchmark_source_commit": "825199027b5e23463cefbcc4de616140ff2a51d4",
+  "runs": 90,
+  "configurations": 15,
+  "measured_runs": 75,
+  "all_passed": true,
+  "all_delivery_and_summary_metrics_reconciled": true,
+  "sha256": {
+    "src/main/java/ru/winkiz/lab4/BrokerClient.java": "ffb3c1d2db1bb44bdbda8d8c313e10e4a61879c9bf8ca7fbccb6e41056a9f108",
+    "src/main/java/ru/winkiz/lab4/LocalBroker.java": "1e10c3fc72aa8d791f133647d009c6220da0ccc80f5797954cca18a14d1535ad",
+    "src/main/java/ru/winkiz/lab4/Main.java": "586e7da3761ad1c159d5fc2758a99d92bb886f3f8302f593e20dff2ee49329c5",
+    "src/main/java/ru/winkiz/lab4/Protocol.java": "2e4ef67dae4dc88bb985a5a9d5ebab8a060b26cee70570f5b42fc91b31421751",
+    "src/main/java/ru/winkiz/lab4/ReportWriter.java": "d9d8b80f28b0eb248ed3ffdef85c6e0a8594012319bcf732179b4b3a2da6fe3b",
+    "src/main/java/ru/winkiz/lab4/ScenarioRunner.java": "9fa75fbd58266f74a0495d0993c0164fc38a952d541338d8b4d4a3c709961c5c",
+    "src/main/java/ru/winkiz/lab4/ThreadSupport.java": "3e14e6d0e7db96f18ff3b7e31bca2446dedeeed34ef7a67db6ef4778e1368bd5",
+    "results/regression/shutdown-2026-11-18/measurements.csv": "991a10c2e9ef961fd9412a634b4690b1ac3ebd3d3596a2e8098846bc84c8eecd",
+    "results/regression/shutdown-2026-11-18/shares.csv": "95345cb9541ef5505fa1441603858c0945c2f43aeadc4e7444d2352df0f93108",
+    "results/regression/shutdown-2026-11-18/summary.csv": "6e392b3f641547f5537f5f6cd6b4dc2ec5340832d8862e9025d768076b56fccc"
+  }
+}
