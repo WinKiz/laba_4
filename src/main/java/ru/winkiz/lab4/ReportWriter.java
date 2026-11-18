@@ -62,8 +62,8 @@ final class ReportWriter {
                 .append("Время измеряется System.nanoTime() непосредственно перед первой отправкой и до последней ожидаемой доставки. Генерация, подготовка соединений (кроме позднего подключения в сценарии 1), завершающее наблюдение за дубликатами, закрытие и экспорт вне измерения. В сценарии 2 в измерение входят барьеры приёма и отключение R1. При FAIL указывается время до остановки/дедлайна; его нельзя трактовать как время полной доставки.\n\n")
                 .append("X=N/T, где N — фактическое количество доставленных сообщений. B=N×размер_UTF8/T — полезная нагрузка в байтах/с, без заголовков TCP и протокола. D=max|доля_i−100/M|, в процентных пунктах.\n\n")
                 .append("Для сценария 2 доли 25%/75% заданы условием, поэтому D=25 п.п. ожидаемо и не означает проблему распределения. Для опытов с разным числом получателей и TCP_NODELAY содержимое сообщений при одинаковом размере и seed одинаковое.\n\n")
-                .append("## Таблица измерений\n\n| Эксперимент | Повторов | Медиана, с | Мин., с | Макс., с | msg/s | байт/с | D, п.п. | Результат |\n|---|---:|---:|---:|---:|---:|---:|---:|---|\n");
-        for (Summary s : summary) report.append(String.format(Locale.ROOT, "| %s | %d | %.6f | %.6f | %.6f | %.1f | %.1f | %.3f | %s |%n", s.name(), s.runs(), s.seconds(), s.min(), s.max(), s.throughput(), s.byteRate(), s.deviation(), s.passed() ? "PASS" : "FAIL"));
+                .append("## Таблица измерений\n\n| Эксперимент | Повторов | Медиана, с | Мин., с | Макс., с | Сообщений/с | Байт/с | D, п.п. | Результат |\n|---|---:|---:|---:|---:|---:|---:|---:|---|\n");
+        for (Summary s : summary) report.append(String.format(Locale.ROOT, "| %s | %d | %.6f | %.6f | %.6f | %.1f | %.1f | %.3f | %s |%n", displayName(s.example()), s.runs(), s.seconds(), s.min(), s.max(), s.throughput(), s.byteRate(), s.deviation(), s.passed() ? "Успех" : "Ошибка"));
         report.append("\n## Сценарий 3: распределение по получателям\n\nКаждая строка — отдельное основное измерение.\n\n| Прогон | Получатель | Количество | Доля, % |\n|---:|---|---:|---:|\n");
         for (Observation o : rows) if (o.phase().equals("measurement") && o.result().name().equals("scenario-3")) {
             var r = o.result();
@@ -71,23 +71,23 @@ final class ReportWriter {
         }
         report.append("\n## Графики\n\n");
         List<Summary> required = summary.stream().filter(s -> s.name().startsWith("scenario-")).toList();
-        draw(output, "scenario-time.png", "Required scenarios: delivery time", "Scenario", "seconds", required, s -> s.seconds(), s -> Integer.toString(s.example().scenario()));
+        draw(output, "scenario-time.png", "Время доставки в обязательных сценариях", "Номер сценария", "Секунды", required, s -> s.seconds(), s -> Integer.toString(s.example().scenario()));
         report.append("![Время сценариев](scenario-time.png)\n\n");
         List<Summary> receiverStudy = summary.stream().filter(s -> s.name().startsWith("receivers-")).toList();
         if (!receiverStudy.isEmpty()) {
-            draw(output, "receivers-throughput.png", "Receiver count and throughput", "Receivers (categories)", "msg/s", receiverStudy, Summary::throughput, s -> Integer.toString(s.example().receivers()));
-            draw(output, "receivers-deviation.png", "Distribution deviation", "Receivers (categories)", "percentage points", receiverStudy, Summary::deviation, s -> Integer.toString(s.example().receivers()));
+            draw(output, "receivers-throughput.png", "Число получателей и пропускная способность", "Количество получателей", "Сообщений/с", receiverStudy, Summary::throughput, s -> Integer.toString(s.example().receivers()));
+            draw(output, "receivers-deviation.png", "Отклонение долей от равномерного распределения", "Количество получателей", "Процентные пункты", receiverStudy, Summary::deviation, s -> Integer.toString(s.example().receivers()));
             report.append("![Получатели и пропускная способность](receivers-throughput.png)\n\n![Отклонение долей](receivers-deviation.png)\n\n");
         }
         List<Summary> sizes = summary.stream().filter(s -> s.name().startsWith("bytes-")).toList();
         if (!sizes.isEmpty()) {
-            draw(output, "size-messages.png", "Payload size and message throughput", "Payload bytes (categories)", "msg/s", sizes, Summary::throughput, s -> Integer.toString(s.example().payloadBytes()));
-            draw(output, "size-bytes.png", "Payload size and byte throughput", "Payload bytes (categories)", "MiB/s", sizes, s -> s.byteRate() / (1024 * 1024), s -> Integer.toString(s.example().payloadBytes()));
+            draw(output, "size-messages.png", "Размер сообщения и скорость доставки сообщений", "Размер сообщения, байт (категории)", "Сообщений/с", sizes, Summary::throughput, s -> Integer.toString(s.example().payloadBytes()));
+            draw(output, "size-bytes.png", "Размер сообщения и скорость передачи данных", "Размер сообщения, байт (категории)", "МиБ/с", sizes, s -> s.byteRate() / (1024 * 1024), s -> Integer.toString(s.example().payloadBytes()));
             report.append("![Размер и msg/s](size-messages.png)\n\n![Размер и МиБ/с](size-bytes.png)\n\n");
         }
         List<Summary> nagle = summary.stream().filter(s -> s.name().startsWith("nodelay-")).toList();
         if (!nagle.isEmpty()) {
-            draw(output, "nodelay.png", "TCP_NODELAY (client side)", "TCP_NODELAY", "seconds", nagle, Summary::seconds, s -> Boolean.toString(s.example().tcpNoDelay()));
+            draw(output, "nodelay.png", "Влияние TCP_NODELAY на время доставки", "TCP_NODELAY на клиенте", "Секунды", nagle, Summary::seconds, s -> s.example().tcpNoDelay() ? "Включён" : "Выключен");
             report.append("![TCP_NODELAY](nodelay.png)\n\n");
         }
         report.append("## Выводы и ограничения\n\n");
@@ -95,7 +95,7 @@ final class ReportWriter {
         report.append("Всего запусков: ").append(rows.size()).append(". Неуспешных: ").append(failures).append(". Полнота проверяется по множествам ожидаемых и принятых ID, отдельно считаются дубликаты, неизвестные ID и повреждённые тексты. Одного равенства счётчиков недостаточно.\n\n");
         if (!receiverStudy.isEmpty()) {
             Summary best = receiverStudy.stream().filter(Summary::passed).max(Comparator.comparingDouble(Summary::throughput)).orElse(null);
-            if (best != null) report.append(String.format(Locale.ROOT, "В этой серии наибольшая медианная скорость среди вариантов числа получателей: %d получателей, %.1f msg/s. Это наблюдение локального стенда, не универсальный оптимум.\n\n", best.example().receivers(), best.throughput()));
+            if (best != null) report.append(String.format(Locale.ROOT, "В этой серии наибольшая медианная скорость получена при числе получателей %d: %.1f сообщений/с. Это наблюдение локального стенда, не универсальный оптимум.\n\n", best.example().receivers(), best.throughput()));
         }
         report.append("В сценарии 2 до закрытия R1 разрешено только одно ещё не учтённое сообщение: отправитель ждёт CountDownLatch предыдущего ID, открываемый после обновления всех счётчиков получателя. После 250-го сообщения R1 закрывается и открывает firstClosed. Затем отправитель продолжает. Это сохраняет порядок задания и предотвращает уход дополнительных сообщений в фоновый буфер R1. Это синхронизация теста внутри одного процесса, а не ACK сетевого протокола. Сценарий 2 нельзя напрямую сравнивать со свободной отправкой по msg/s.\n\n")
                 .append("Обнаруженная гонка штатного отключения исправлена: клиент-получатель выполняет shutdownOutput и ограниченно ждёт ответный EOF, а LocalBroker исключает соединение из распределения до закрытия своей стороны. После ожидания клиент в любом случае закрывает сокет. Это завершение TCP, а не новая команда или ACK доставки.\n\n")
@@ -110,6 +110,15 @@ final class ReportWriter {
     }
 
     private static String quote(String text) { return "\"" + text.replace("\"", "\"\"") + "\""; }
+    private static String displayName(ScenarioRunner.Result result) {
+        String name = result.name();
+        if (name.startsWith("scenario-")) return "Сценарий " + result.scenario();
+        if (name.startsWith("receivers-")) return "Получателей: " + result.receivers();
+        if (name.startsWith("bytes-")) return "Размер: " + result.payloadBytes() + " байт";
+        if (name.startsWith("nodelay-")) return "TCP_NODELAY: " + (result.tcpNoDelay() ? "включён" : "выключен");
+        if (name.equals("load-4x4")) return "Нагрузка: 4 отправителя, 4 получателя";
+        return name;
+    }
     private static double median(double[] values) {
         java.util.Arrays.sort(values);
         int n = values.length;
