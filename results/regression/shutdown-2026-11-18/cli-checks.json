@@ -1,0 +1,30 @@
+{
+  "noargs": {
+    "expected": 0,
+    "actual": 0
+  },
+  "invalid-option": {
+    "expected": 1,
+    "actual": 1
+  },
+  "invalid-count": {
+    "expected": 1,
+    "actual": 1
+  },
+  "help": {
+    "expected": 0,
+    "actual": 0
+  },
+  "standalone-server": {
+    "expected": 0,
+    "actual": 0
+  },
+  "existing-output": {
+    "expected": 1,
+    "actual": 1
+  },
+  "unavailable-server": {
+    "expected": 1,
+    "actual": 1
+  }
+}

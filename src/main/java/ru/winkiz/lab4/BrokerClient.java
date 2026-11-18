@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -39,6 +40,7 @@ public final class BrokerClient implements AutoCloseable {
     private boolean closed;
     private final Thread reader;
     private final ScheduledThreadPoolExecutor writeWatchdog;
+    private final List<Thread> watchdogThreads = new CopyOnWriteArrayList<>();
     private record Received(String text, int bytes) { }
 
     public BrokerClient(String host, int port, Role role, String queue) throws IOException {
@@ -64,7 +66,11 @@ public final class BrokerClient implements AutoCloseable {
             reader = role == Role.RECEIVER
                     ? new Thread(this::readLoop, "broker-client-reader-" + IDS.incrementAndGet()) : null;
             writeWatchdog = role == Role.SENDER ? new ScheduledThreadPoolExecutor(1,
-                    task -> new Thread(task, "broker-client-write-watchdog-" + IDS.incrementAndGet())) : null;
+                    task -> {
+                        Thread thread = new Thread(task, "broker-client-write-watchdog-" + IDS.incrementAndGet());
+                        watchdogThreads.add(thread);
+                        return thread;
+                    }) : null;
             if (writeWatchdog != null) writeWatchdog.setRemoveOnCancelPolicy(true);
             if (reader != null) reader.start();
         } catch (IOException | RuntimeException e) {
@@ -179,13 +185,8 @@ public final class BrokerClient implements AutoCloseable {
             if (reader.isAlive()) error = new IOException("Receiver thread did not terminate");
         }
         if (writeWatchdog != null) {
-            writeWatchdog.shutdownNow();
-            long begin = System.nanoTime();
-            while (!writeWatchdog.isTerminated() && System.nanoTime() - begin < 3_000_000_000L) {
-                try { writeWatchdog.awaitTermination(100, TimeUnit.MILLISECONDS); }
-                catch (InterruptedException e) { interrupted = true; }
-            }
-            if (!writeWatchdog.isTerminated()) error = new IOException("Send watchdog did not terminate");
+            if (!ThreadSupport.shutdown(writeWatchdog, watchdogThreads, Duration.ofSeconds(3)))
+                error = new IOException("Send watchdog did not terminate");
         }
         if (interrupted) Thread.currentThread().interrupt();
         if (error != null) throw error;

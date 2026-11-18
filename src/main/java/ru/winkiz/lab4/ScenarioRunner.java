@@ -159,7 +159,12 @@ public final class ScenarioRunner {
             }
             generated.add(messages);
         }
-        ExecutorService pool = Executors.newFixedThreadPool(plan.senders() + plan.receivers(), r -> new Thread(r, "lab4-scenario-worker"));
+        List<Thread> workerThreads = new CopyOnWriteArrayList<>();
+        ExecutorService pool = Executors.newFixedThreadPool(plan.senders() + plan.receivers(), r -> {
+            Thread thread = new Thread(r, "lab4-scenario-worker");
+            workerThreads.add(thread);
+            return thread;
+        });
         List<Future<?>> futures = new ArrayList<>();
         List<BrokerClient> receivers = new ArrayList<>();
         long finished = 0;
@@ -195,8 +200,8 @@ public final class ScenarioRunner {
             state.stopped = true;
             state.start.countDown(); state.firstHalf.countDown(); state.receiverConnected.countDown(); state.firstClosed.countDown();
             for (BrokerClient client : state.clients) try { client.close(); } catch (IOException e) { state.errors.add(e.toString()); }
-            pool.shutdownNow();
-            if (!pool.awaitTermination(5, TimeUnit.SECONDS)) state.errors.add("Scenario worker threads remain");
+            if (!ThreadSupport.shutdown(pool, workerThreads, Duration.ofSeconds(5)))
+                state.errors.add("Scenario worker threads remain");
         }
         Set<String> missing = new HashSet<>(state.expected.keySet()); missing.removeAll(state.seen);
         int total = state.totalReceived.get();

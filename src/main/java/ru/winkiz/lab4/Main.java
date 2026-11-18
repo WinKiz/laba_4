@@ -91,6 +91,17 @@ public final class Main {
         long remaining = countLabThreads();
         passed &= remaining == 0;
         Files.createDirectories(output);
+        if (remaining != 0) {
+            StringBuilder dump = new StringBuilder("Потоки после закрытия: " + remaining + "\n");
+            Thread.getAllStackTraces().forEach((thread, stack) -> {
+                if (isLabThread(thread) && thread.isAlive()) {
+                    dump.append(thread.getName()).append(" ").append(thread.getState()).append('\n');
+                    for (StackTraceElement frame : stack) dump.append("  ").append(frame).append('\n');
+                }
+            });
+            Files.writeString(output.resolve("threads-after-close.txt"), dump, StandardCharsets.UTF_8);
+            System.err.println("FAIL: после закрытия остались потоки: " + remaining + "; см. threads-after-close.txt");
+        }
         Files.writeString(output.resolve("environment.txt"), "server=" + (local ? "auxiliary LocalBroker (loopback); not teacher server" : host + ":" + port)
                 + "\njava=" + System.getProperty("java.version") + "\nos=" + System.getProperty("os.name")
                 + "\nprocessors=" + Runtime.getRuntime().availableProcessors() + "\nseed=" + seed + "\ntimeout_seconds=" + timeout
@@ -103,7 +114,12 @@ public final class Main {
 
     static long countLabThreads() {
         return Thread.getAllStackTraces().keySet().stream().filter(Thread::isAlive)
-                .filter(t -> t.getName().startsWith("broker-client-") || t.getName().startsWith("lab4-scenario-") || t.getName().startsWith("broker-local-")).count();
+                .filter(Main::isLabThread).count();
+    }
+
+    private static boolean isLabThread(Thread thread) {
+        return thread.getName().startsWith("broker-client-") || thread.getName().startsWith("lab4-scenario-")
+                || thread.getName().startsWith("broker-local-");
     }
 
     private static int integer(Map<String, String> flags, String name, int fallback, int min, int max) {

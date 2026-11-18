@@ -33,7 +33,7 @@ java -jar target/lab4-broker-client-1.0.jar
 
 `mvn package` компилирует программу, запускает SelfTest на фазе `test` и собирает исполняемый JAR. Тесты не требуют внешнего сервера. Для первого Maven-запуска нужен доступ к Maven Central.
 
-SelfTest содержит 28 самостоятельных проверок с явными AssertionError. В выводе Maven строка Surefire `Tests run: 0` относится к отсутствующим JUnit-тестам; ниже должен быть запуск `exec:java (protocol-tests)` и **SELFTEST PASS: 28 checks**. Именно он выполняет сетевые проверки. Ошибка любой из них завершает Maven-сборку неуспешно.
+SelfTest содержит 29 самостоятельных проверок с явными AssertionError. В выводе Maven строка Surefire `Tests run: 0` относится к отсутствующим JUnit-тестам; ниже должен быть запуск `exec:java (protocol-tests)` и **SELFTEST PASS: 29 checks**. Именно он выполняет сетевые проверки. Ошибка любой из них завершает Maven-сборку неуспешно.
 
 Если Maven не установлен, на Windows:
 

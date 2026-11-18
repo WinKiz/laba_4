@@ -52,6 +52,38 @@ public final class SelfTest {
     }
 
     public static void main(String[] args) throws Exception {
+        test("Shutdown joins worker even after executor termination", () -> {
+            List<Thread> threads = new java.util.concurrent.CopyOnWriteArrayList<>();
+            CountDownLatch epilogue = new CountDownLatch(1), release = new CountDownLatch(1);
+            ExecutorService executor = Executors.newSingleThreadExecutor(task -> {
+                Thread thread = new Thread(() -> {
+                    task.run();
+                    epilogue.countDown();
+                    boolean interrupted = false;
+                    try {
+                        while (release.getCount() != 0) {
+                            try { release.await(); }
+                            catch (InterruptedException e) { interrupted = true; }
+                        }
+                    } finally { if (interrupted) Thread.currentThread().interrupt(); }
+                }, "broker-local-selftest-epilogue");
+                threads.add(thread);
+                return thread;
+            });
+            try {
+                executor.submit(() -> { }).get(2, TimeUnit.SECONDS);
+                executor.shutdown();
+                check(epilogue.await(2, TimeUnit.SECONDS), "Worker reached epilogue");
+                check(executor.awaitTermination(2, TimeUnit.SECONDS), "Executor already terminated");
+                check(!ThreadSupport.shutdown(executor, threads, Duration.ofMillis(30)), "Live worker must fail shutdown check");
+                release.countDown();
+                check(ThreadSupport.shutdown(executor, threads, SECOND), "Join completes");
+                check(!threads.get(0).isAlive(), "Worker really exited");
+            } finally {
+                release.countDown();
+                ThreadSupport.shutdown(executor, threads, SECOND);
+            }
+        });
         test("UTF-8 byte length, framing and fragmented input", () -> {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             Protocol.writeMessage(output, Protocol.encode("привет"));

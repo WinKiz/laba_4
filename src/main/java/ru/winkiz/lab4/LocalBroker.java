@@ -14,8 +14,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.List;
+import java.time.Duration;
 
 /** Auxiliary development broker, NOT the teacher's server or the assessed client. */
 public final class LocalBroker implements AutoCloseable {
@@ -23,6 +25,7 @@ public final class LocalBroker implements AutoCloseable {
     private final Set<Socket> sockets = ConcurrentHashMap.newKeySet();
     private final ConcurrentHashMap<String, Mailbox> queues = new ConcurrentHashMap<>();
     private final ExecutorService workers;
+    private final List<Thread> workerThreads = new CopyOnWriteArrayList<>();
     private volatile boolean closed;
     private final AtomicLong protocolErrors = new AtomicLong();
 
@@ -41,7 +44,11 @@ public final class LocalBroker implements AutoCloseable {
     public LocalBroker(String bind, int port) throws IOException {
         listener = new ServerSocket(port, 128, InetAddress.getByName(bind));
         AtomicLong ids = new AtomicLong();
-        workers = Executors.newCachedThreadPool(r -> new Thread(r, "broker-local-" + ids.incrementAndGet()));
+        workers = Executors.newCachedThreadPool(r -> {
+            Thread thread = new Thread(r, "broker-local-" + ids.incrementAndGet());
+            workerThreads.add(thread);
+            return thread;
+        });
         workers.submit(this::acceptLoop);
     }
 
@@ -151,13 +158,8 @@ public final class LocalBroker implements AutoCloseable {
             try { socket.close(); } catch (IOException e) { failure = e; }
         }
         for (Mailbox box : queues.values()) synchronized (box) { box.notifyAll(); }
-        workers.shutdownNow();
-        try {
-            if (!workers.awaitTermination(5, TimeUnit.SECONDS)) failure = new IOException("Local broker threads remain");
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            failure = new IOException("Broker shutdown interrupted", e);
-        }
+        if (!ThreadSupport.shutdown(workers, workerThreads, Duration.ofSeconds(5)))
+            failure = new IOException("Local broker threads remain");
         if (failure != null) throw failure;
     }
 }
