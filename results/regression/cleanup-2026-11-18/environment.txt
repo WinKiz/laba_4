@@ -1,0 +1,11 @@
+server=auxiliary LocalBroker (loopback); not teacher server
+java=23.0.2
+os=Windows 10
+processors=16
+seed=20261117
+timeout_seconds=10.0
+warmups=1
+repeats=5
+threads_before_clients=1
+lab_threads_after_close=0
+protocol_errors=0

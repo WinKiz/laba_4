@@ -1,0 +1,14 @@
+{
+  "benchmark_source_commit": null,
+  "verifier_sha256": "465a9c206d98517cb512152b27c9d4dc9ccf855067fcf065639d160e964eaab7",
+  "runs": 90,
+  "configurations": 15,
+  "measured_runs": 75,
+  "all_passed": true,
+  "all_delivery_and_summary_metrics_reconciled": true,
+  "result_sha256": {
+    "measurements.csv": "19458eef08ff08d52a188eb5f803e3439e32db010c7a25a22a4f33e208c0b487",
+    "shares.csv": "95345cb9541ef5505fa1441603858c0945c2f43aeadc4e7444d2352df0f93108",
+    "summary.csv": "53601553bdf31d51ff8b0b32b58e5df0a7eb7e94dcadc2f586efd1d8dca9ac18"
+  }
+}

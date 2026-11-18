@@ -10,7 +10,7 @@ import subprocess
 import sys
 
 root = Path(__file__).resolve().parents[1]
-folder = (root / (sys.argv[1] if len(sys.argv) > 1 else "results/local")).resolve()
+folder = (root / (sys.argv[1] if len(sys.argv) > 1 else "results/final")).resolve()
 
 
 def read(name):
@@ -50,7 +50,8 @@ for row in rows:
     close(row["bytes_per_second"], received * int(row["payload_bytes"]) / time)
     ideal = 100 / int(row["receivers"])
     close(row["deviation_pp"], max(abs(float(r["share_percent"]) - ideal) for r in shares[key]))
-    assert 0 <= float(row["latency_median_ms"]) <= float(row["latency_p95_ms"])
+    if "latency_median_ms" in row:  # Historical runs before optional latency metrics were removed.
+        assert 0 <= float(row["latency_median_ms"]) <= float(row["latency_p95_ms"])
     groups[row["experiment"]].append(row)
 
 summaries = {r["experiment"]: r for r in read("summary.csv")}
@@ -65,6 +66,8 @@ for name, values in groups.items():
     summary = summaries[name]
     assert summary["result"] == "PASS" and int(summary["runs"]) == 5
     for destination, source in fields.items():
+        if source.startswith("latency_") and destination not in summary:
+            continue
         close(summary[destination], statistics.median(float(r[source]) for r in measured))
     close(summary["min_seconds"], min(float(r["time_seconds"]) for r in measured))
     close(summary["max_seconds"], max(float(r["time_seconds"]) for r in measured))
@@ -77,12 +80,17 @@ assert set(groups) == expected and len(rows) == 90
 environment = dict(line.split("=", 1) for line in (folder / "environment.txt").read_text(encoding="utf-8").splitlines())
 assert environment["lab_threads_after_close"] == "0" and environment["protocol_errors"] == "0"
 
+provenance_path = folder / "provenance.json"
+provenance = json.loads(provenance_path.read_text(encoding="utf-8")) if provenance_path.exists() else {}
+current_commit = subprocess.check_output(["git", "-c", f"safe.directory={root.as_posix()}", "rev-parse", "HEAD"], cwd=root, text=True).strip()
+dirty_sources = subprocess.check_output(["git", "-c", f"safe.directory={root.as_posix()}", "status", "--porcelain", "--", "src/main/java"], cwd=root, text=True).strip()
 manifest = {
-    "benchmark_source_commit": subprocess.check_output(["git", "-c", f"safe.directory={root.as_posix()}", "rev-parse", "HEAD"], cwd=root, text=True).strip(),
+    "benchmark_source_commit": provenance.get("benchmark_source_commit", None if dirty_sources else current_commit),
+    "verifier_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     "runs": len(rows), "configurations": len(groups), "measured_runs": 75,
     "all_passed": True, "all_delivery_and_summary_metrics_reconciled": True,
-    "sha256": {str(p.relative_to(root)).replace("\\", "/"): hashlib.sha256(p.read_bytes()).hexdigest()
-               for p in [*sorted((root / "src/main/java").rglob("*.java")), folder / "measurements.csv", folder / "shares.csv", folder / "summary.csv"]},
+    "result_sha256": {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+                      for p in [folder / "measurements.csv", folder / "shares.csv", folder / "summary.csv"]},
 }
 (folder / "verification.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 print(f"PASS: {len(rows)} runs, {len(groups)} configurations; counts, shares, rates and medians reconciled.")

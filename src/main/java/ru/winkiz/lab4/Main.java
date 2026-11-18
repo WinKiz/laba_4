@@ -80,11 +80,11 @@ public final class Main {
                     System.out.printf(Locale.ROOT, "%s %s #%d: sent=%d received=%d lost=%d duplicates=%d time=%.6f s X=%.1f msg/s %s%n",
                             plan.name(), phase, index, result.sent(), result.received(), result.lost(), result.duplicates(), result.seconds(), result.throughput(), result.passed() ? "PASS" : "FAIL");
                     if (!result.error().isEmpty()) System.out.println("  " + result.error());
-                    for (int i = 0; i < result.counts().length; i++) System.out.printf(Locale.ROOT, "  R%d: %d (%.2f%%)%n", i + 1, result.counts()[i], result.received() == 0 ? 0 : 100.0 * result.counts()[i] / result.received());
+                    if (plan.scenario() == 3 && phase.equals("measurement"))
+                        for (int i = 0; i < result.counts().length; i++) System.out.printf(Locale.ROOT, "  R%d: %d (%.2f%%)%n", i + 1, result.counts()[i], result.received() == 0 ? 0 : 100.0 * result.counts()[i] / result.received());
                     if (plan.scenario() == 3 && result.received() > 0)
                         for (int count : result.counts()) if (100.0 * count / result.received() < 20 && plan.receivers() == 3)
                             System.out.println("  Distribution warning: a receiver has less than 20%; inspect server scheduling.");
-                    // A failed experiment remains in CSV and causes exit code 1. Never replace it by an expected value.
                 }
             }
         } finally { if (broker != null) broker.close(); }
@@ -129,13 +129,14 @@ public final class Main {
     }
 
     private static Map<String, String> parse(String[] args) {
-        SetNames allowed = new SetNames();
+        var booleans = java.util.Set.of("help", "server", "local", "full");
+        var allowed = java.util.Set.of("help", "server", "local", "full", "host", "port", "bind", "out", "scenario", "messages", "bytes", "timeout", "seed", "queue", "nodelay", "warmups", "repeats");
         Map<String, String> result = new HashMap<>();
         for (int i = 0; i < args.length; i++) {
             if (!args[i].startsWith("--")) throw new IllegalArgumentException("Expected --option: " + args[i]);
             String key = args[i].substring(2);
-            if (!allowed.all.contains(key) || result.containsKey(key)) throw new IllegalArgumentException("Unknown or repeated option --" + key);
-            if (allowed.booleans.contains(key)) result.put(key, "true");
+            if (!allowed.contains(key) || result.containsKey(key)) throw new IllegalArgumentException("Unknown or repeated option --" + key);
+            if (booleans.contains(key)) result.put(key, "true");
             else {
                 if (++i == args.length) throw new IllegalArgumentException("Missing value for --" + key);
                 result.put(key, args[i]);
@@ -143,11 +144,6 @@ public final class Main {
         }
         if (result.containsKey("nodelay") && !List.of("true", "false").contains(result.get("nodelay"))) throw new IllegalArgumentException("--nodelay must be true or false");
         return result;
-    }
-
-    private static final class SetNames {
-        final java.util.Set<String> booleans = java.util.Set.of("help", "server", "local", "full");
-        final java.util.Set<String> all = java.util.Set.of("help", "server", "local", "full", "host", "port", "bind", "out", "scenario", "messages", "bytes", "timeout", "seed", "queue", "nodelay", "warmups", "repeats");
     }
 
     private static void help() {

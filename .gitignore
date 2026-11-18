@@ -1,6 +1,7 @@
 target/
 results/*/
 !results/local/
+!results/final/
 !results/regression/
 !results/diagnostics/
 .idea/

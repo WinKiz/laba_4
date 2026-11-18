@@ -1,0 +1,11 @@
+{
+  "source": "User run results/my-run, checked against pasted console output",
+  "benchmark_source_commit": null,
+  "note": "Exact benchmark build commit was not recorded. Run predates removal of optional latency metrics. Original CSV and environment are preserved byte for byte; report and plots are regenerated, not remeasured.",
+  "console_runs_checked": 90,
+  "raw_sha256": {
+    "measurements.csv": "19458eef08ff08d52a188eb5f803e3439e32db010c7a25a22a4f33e208c0b487",
+    "shares.csv": "95345cb9541ef5505fa1441603858c0945c2f43aeadc4e7444d2352df0f93108",
+    "environment.txt": "90cd2d524de563613029e2f31773a285202010ec71d72f3b5fd2dcaf7289a823"
+  }
+}

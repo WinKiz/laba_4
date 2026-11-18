@@ -1,0 +1,5 @@
+# Preserve measured input bytes and their recorded checksums on Windows checkouts.
+results/final/*.csv -text
+results/final/environment.txt -text
+results/regression/cleanup-2026-11-18/*.csv -text
+results/regression/cleanup-2026-11-18/environment.txt -text

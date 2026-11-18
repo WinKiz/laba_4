@@ -3,7 +3,6 @@ package ru.winkiz.lab4;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +31,7 @@ public final class ScenarioRunner {
                          boolean tcpNoDelay, int sent, int received, int unique, int lost,
                          int duplicates, int unexpected, int corrupted, double seconds,
                          double throughput, double bytesPerSecond, int[] counts, double deviation,
-                         double medianLatencyMs, double p95LatencyMs, boolean passed, String error) { }
+                         boolean passed, String error) { }
 
     private final Options options;
     public ScenarioRunner(Options options) { this.options = options; }
@@ -42,8 +41,6 @@ public final class ScenarioRunner {
         final Map<String, String> expected = new HashMap<>();
         final Set<String> sentIds = ConcurrentHashMap.newKeySet();
         final Set<String> seen = ConcurrentHashMap.newKeySet();
-        final ConcurrentHashMap<String, Long> sendTimes = new ConcurrentHashMap<>();
-        final ConcurrentHashMap<String, Long> arrivals = new ConcurrentHashMap<>();
         final Map<String, CountDownLatch> processed = new HashMap<>();
         final List<String> errors = new CopyOnWriteArrayList<>();
         final List<BrokerClient> clients = new CopyOnWriteArrayList<>();
@@ -76,7 +73,6 @@ public final class ScenarioRunner {
         void failure(Throwable e) {
             errors.add(e.getClass().getSimpleName() + ": " + e.getMessage());
             stopped = true;
-            synchronized (progress) { progress.notifyAll(); }
         }
 
         void await(CountDownLatch latch) throws InterruptedException, TimeoutException {
@@ -95,8 +91,6 @@ public final class ScenarioRunner {
                 counts[receiver]++;
                 totalReceived.incrementAndGet();
                 lastReceived = Math.max(lastReceived, now);
-                arrivals.putIfAbsent(id, now);
-                progress.notifyAll();
             }
             CountDownLatch processedMessage = processed.get(id);
             if (processedMessage != null) processedMessage.countDown();
@@ -127,7 +121,6 @@ public final class ScenarioRunner {
                     if (remaining() <= 0) throw new TimeoutException("Sending exceeded scenario deadline");
                     String message = messages.get(i), id = message.substring(0, message.indexOf(':'));
                     synchronized (progress) { if (began == 0) began = System.nanoTime(); }
-                    sendTimes.put(id, System.nanoTime());
                     client.send(message);
                     sentIds.add(id);
                     if (plan.scenario() == 1 && i + 1 == messages.size() / 2) {
@@ -213,16 +206,11 @@ public final class ScenarioRunner {
         if (plan.scenario() == 2) passed &= state.counts[0] == plan.total() / 4 && state.counts[1] == plan.total() * 3 / 4;
         double deviation = 0;
         for (int count : state.counts) deviation = Math.max(deviation, Math.abs((total == 0 ? 0 : 100.0 * count / total) - 100.0 / plan.receivers()));
-        double[] latencies = state.arrivals.entrySet().stream().filter(e -> state.sendTimes.containsKey(e.getKey()))
-                .mapToDouble(e -> (e.getValue() - state.sendTimes.get(e.getKey())) / 1e6).sorted().toArray();
-        double median = latencies.length == 0 ? 0 : latencies.length % 2 == 0
-                ? (latencies[latencies.length / 2 - 1] + latencies[latencies.length / 2]) / 2 : latencies[latencies.length / 2];
-        double p95 = latencies.length == 0 ? 0 : latencies[(int) Math.ceil(latencies.length * .95) - 1];
         return new Result(plan.name(), plan.scenario(), plan.senders(), plan.receivers(), plan.payloadBytes(), plan.tcpNoDelay(),
                 state.sentIds.size(), total, state.seen.size(), missing.size(), state.duplicates.get(), state.unexpected.get(),
                 state.corrupted.get(), seconds, seconds > 0 ? total / seconds : 0,
                 seconds > 0 ? (double) total * plan.payloadBytes() / seconds : 0,
-                state.counts.clone(), deviation, median, p95, passed, String.join(" | ", state.errors));
+                state.counts.clone(), deviation, passed, String.join(" | ", state.errors));
     }
 
     private static String payload(String id, int bytes, Random random) {
